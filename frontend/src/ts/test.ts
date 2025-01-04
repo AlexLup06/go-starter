@@ -1,5 +1,1 @@
-import { testFunction } from "./testFunction";
-
-console.log('Hello from test.js');
-
-testFunction();
+console.log('Hello World!');
