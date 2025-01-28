@@ -1,6 +1,39 @@
-version: '3.8'
-
 services:
+
+  frontend:
+    image: node:20-alpine
+    working_dir: /frontend
+    volumes:
+      - ./frontend:/frontend
+    command: npm run dev:webpack
+
+
+  postgres:
+    image: postgres:16.2
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRESQL_DATABASE}
+      POSTGRES_USER: ${POSTGRESQL_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD}
+    healthcheck:
+      test: "/usr/bin/pg_isready --dbname=${POSTGRESQL_DATABASE} --username=${POSTGRESQL_USERNAME} || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend-migrations:
+    build:
+      context: ./migrations
+      dockerfile: Dockerfile
+    env_file:
+        - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: on-failure:3
+
   server:
     build:
       context: .
@@ -9,16 +42,13 @@ services:
       - "8080-8081:8080"
     volumes:
       - .:/app
-    command: air
-    environment:
-      - ENV=development
-
-  frontend:
-    image: node:20-alpine
-    working_dir: /frontend
-    volumes:
-      - ./frontend:/frontend
-    command: npm run dev:all
+    env_file:
+        - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      backend-migrations:
+        condition: service_completed_successfully
 
   caddy:
     image: caddy:2.7-alpine
@@ -27,3 +57,7 @@ services:
       - "3000:3000"
     volumes:
       - ${PWD}/caddy/Caddyfile.dev:/etc/caddy/Caddyfile
+
+volumes:
+  postgres_data:
+    name: postgres_data

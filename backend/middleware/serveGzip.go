@@ -12,7 +12,7 @@ func ServeGzippedFiles(isProductionMode bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Check if the client accepts gzip
 		acceptEncoding := c.GetHeader("Accept-Encoding")
-		c.Writer.Header().Set("Cache-Control", "public, max-age=31536000")
+		c.Writer.Header().Set("Cache-Control", "public, max-age=604800")
 		if strings.Contains(acceptEncoding, "gzip") {
 			// Check if a .gz version of the file exists
 			requestedFilePath := c.Request.URL.Path
