@@ -5,20 +5,15 @@ import (
 	"fmt"
 
 	"alexlupatsiy.com/personal-website/backend/config"
-	"alexlupatsiy.com/personal-website/backend/db"
+	"alexlupatsiy.com/personal-website/backend/helpers/render"
+	"github.com/gin-contrib/gzip"
 
 	"github.com/sethvargo/go-envconfig"
 
 	"alexlupatsiy.com/personal-website/backend/middleware"
 	"alexlupatsiy.com/personal-website/frontend/src/views"
-	"github.com/a-h/templ"
 	"github.com/gin-gonic/gin"
 )
-
-func render(c *gin.Context, status int, template templ.Component) error {
-	c.Status(status)
-	return template.Render(c.Request.Context(), c.Writer)
-}
 
 func RealMain() error {
 
@@ -32,12 +27,11 @@ func RealMain() error {
 	}
 
 	// Init db
-	dbClient, err := db.NewClient(cfg.DbConfig)
-	if err != nil {
-		return fmt.Errorf("can't create new db: %w", err)
-	}
-	contextDb := db.NewContextDb(dbClient.GormDb())
-	fmt.Println(contextDb)
+	// dbClient, err := db.NewClient(cfg.DbConfig)
+	// if err != nil {
+	// 	return fmt.Errorf("can't create new db: %w", err)
+	// }
+	// contextDb := db.NewContextDb(dbClient.GormDb())
 
 	var staticBasePath string
 	if !cfg.DevMode {
@@ -56,9 +50,10 @@ func RealMain() error {
 	}
 
 	router.Use(middleware.CheckHTMXRequest())
+	router.Use(gzip.Gzip(gzip.DefaultCompression))
 
 	router.GET("/", func(c *gin.Context) {
-		render(c, 200, views.Home())
+		render.Render(c, 200, views.Home())
 	})
 
 	if err := router.Run(":8080"); err != nil {

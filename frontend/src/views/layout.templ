@@ -24,7 +24,7 @@ templ Layout() {
 					font-display: swap;
 				}
 				body {
-					font-family: 'FunnelSans', sans-serif;
+					font-family: 'FunnelSans', Arial, sans-serif;
 				}
 			</style>
 			<script type="application/ld+json">
@@ -35,12 +35,12 @@ templ Layout() {
 				"url": "https://example.com",
 			}
 			</script>
+			<script src="/js/htmx.min.js" defer></script>
+			<script src="/js/alpine.min.js" defer></script>
+			<script src="/js/bundle.js" defer></script>
 		</head>
 		<body class="m-0">
 			{ children... }
 		</body>
-		<script src="/js/htmx/htmx.min.js" defer></script>
-		<script src="/js/alpine.min.js" defer></script>
-		<script src="/js/build/bundle.js" type="module" defer></script>
 	</html>
 }

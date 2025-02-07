@@ -6,5 +6,5 @@ import "alexlupatsiy.com/personal-website/backend/db"
 // Like DbConfiguration, later InfluxConfiguration etc.
 type Config struct {
 	DbConfig db.Config
-	DevMode  bool `env:"DEV_MODE, default=false"`
+	DevMode  bool `env:"DEV_MODE, default=true"`
 }
