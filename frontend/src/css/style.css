@@ -2,6 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-button {
-    font-family: inherit
+[x-cloak] {
+    display: none !important;
 }

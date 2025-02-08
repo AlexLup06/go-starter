@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "alexlupatsiy.com/personal-website/frontend/src/views"
 
-func Login() templ.Component {
+func Signup() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -44,7 +44,7 @@ func Login() templ.Component {
 					}()
 				}
 				ctx = templ.InitializeContext(ctx)
-				templ_7745c5c3_Err = login().Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = signup().Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -55,7 +55,7 @@ func Login() templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = login().Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = signup().Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -64,7 +64,7 @@ func Login() templ.Component {
 	})
 }
 
-func login() templ.Component {
+func signup() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -85,15 +85,15 @@ func login() templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"absolute bg-grey-100 rounded-3xl left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 py-16 px-20\"><div class=\"text-3xl mb-6\">Log In</div><div class=\"flex gap-2\"><button class=\"w-1/2 bg-grey-200 py-2 px-4 rounded-xl ml-auto\">Apple</button> <button class=\"w-1/2 bg-grey-200 py-2 px-4 rounded-xl ml-auto\">Google</button></div><div class=\"relative flex justify-center my-3\"><p class=\"bg-grey-100 px-2\">or</p><div class=\"absolute w-full top-1/2 -translate-y-1/2 left 0 h-0.5 bg-grey-200 -z-10\"></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div x-data=\"{open:false}\" class=\"absolute bg-grey-100 rounded-3xl left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 py-16 px-20\"><div class=\"text-3xl mb-6\">Sign Up</div><div class=\"flex gap-2\"><button class=\"w-1/2 bg-grey-200 py-2 px-4 rounded-xl ml-auto\">Apple</button> <button class=\"w-1/2 bg-grey-200 py-2 px-4 rounded-xl ml-auto\">Google</button></div><div class=\"relative flex justify-center my-3\"><p class=\"bg-grey-100 px-2\">or</p><div class=\"absolute w-full top-1/2 -translate-y-1/2 left 0 h-0.5 bg-grey-200 -z-10\"></div></div><button x-show=\"!open\" @click=\"open=true\" class=\"w-full bg-grey-200 py-2 px-4 rounded-xl\">Sign up with Email</button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = LoginForm().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = SignupForm().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"mt-3\"><p>Don't have an Account?  <a hx-get=\"/auth/signup\" hx-target=\"body\" hx-push-url=\"true\" class=\"cursor-pointer underline\">Sign Up</a>!</p></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"mt-3\"><p>Already have an Account?  <a hx-get=\"/auth/login\" hx-target=\"body\" hx-push-url=\"true\" class=\"cursor-pointer underline\">Log In</a>!</p></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -101,7 +101,7 @@ func login() templ.Component {
 	})
 }
 
-func LoginForm() templ.Component {
+func SignupForm() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -122,11 +122,11 @@ func LoginForm() templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<form hx-post=\"/auth/login/email\" hx-target=\"this\" hx-swap=\"outerHTML\" hx-on=\"htmx:beforeSwap: if(event.detail.xhr.status === 200) { window.location.href = &#39;/&#39;; }\"><label for=\"email\">Email:</label><br>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<form x-cloak x-show=\"open\" hx-post=\"/auth/signup/email\" hx-target=\"this\" hx-swap=\"outerHTML\" hx-on=\"htmx:beforeSwap: if(event.detail.xhr.status === 200) { window.location.href = &#39;/&#39;; }\"><label for=\"email\">Email:</label><br>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var5 = []any{"bg-grey-200 rounded-lg px-2", templ.KV("border-2 border-errorColor", ctx.Value("isWrongEmail") == "true")}
+		var templ_7745c5c3_Var5 = []any{"bg-grey-200 rounded-lg px-2 ", templ.KV("border-2 border-errorColor", ctx.Value("isWrongEmail") == "true")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var5...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -138,7 +138,7 @@ func LoginForm() templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var5).String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/src/views/auth/login.templ`, Line: 1, Col: 0}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/src/views/auth/signup.templ`, Line: 1, Col: 0}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -156,7 +156,7 @@ func LoginForm() templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(ctx.Value("email").(string))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/src/views/auth/login.templ`, Line: 59, Col: 39}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/src/views/auth/signup.templ`, Line: 68, Col: 39}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -179,7 +179,7 @@ func LoginForm() templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(ctx.Value("password").(string))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/src/views/auth/login.templ`, Line: 72, Col: 42}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/src/views/auth/signup.templ`, Line: 81, Col: 42}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -190,7 +190,7 @@ func LoginForm() templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "><br><button type=\"submit\" class=\"bg-grey-200 rounded-xl px-4 py-2 mt-3\">Log In</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "><br><button type=\"submit\" class=\"bg-grey-200 rounded-xl px-4 py-2 mt-3\">Create Account</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

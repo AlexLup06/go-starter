@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Render(c *gin.Context, status int, template templ.Component) error {
-	c.Status(status)
-	return template.Render(c.Request.Context(), c.Writer)
+func Render(ctx *gin.Context, status int, template templ.Component) error {
+	ctx.Status(status)
+	return template.Render(ctx.Request.Context(), ctx.Writer)
 }

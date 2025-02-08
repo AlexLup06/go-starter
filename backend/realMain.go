@@ -5,13 +5,14 @@ import (
 	"fmt"
 
 	"alexlupatsiy.com/personal-website/backend/config"
-	"alexlupatsiy.com/personal-website/backend/helpers/render"
+	"alexlupatsiy.com/personal-website/backend/db"
+	"alexlupatsiy.com/personal-website/backend/handler"
+	"alexlupatsiy.com/personal-website/backend/service"
 	"github.com/gin-contrib/gzip"
 
 	"github.com/sethvargo/go-envconfig"
 
 	"alexlupatsiy.com/personal-website/backend/middleware"
-	"alexlupatsiy.com/personal-website/frontend/src/views"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,34 +28,38 @@ func RealMain() error {
 	}
 
 	// Init db
-	// dbClient, err := db.NewClient(cfg.DbConfig)
-	// if err != nil {
-	// 	return fmt.Errorf("can't create new db: %w", err)
-	// }
-	// contextDb := db.NewContextDb(dbClient.GormDb())
-
-	var staticBasePath string
-	if !cfg.DevMode {
-		staticBasePath = "/root/public"
-	} else {
-		staticBasePath = "./frontend/public"
+	dbClient, err := db.NewClient(cfg.DbConfig)
+	if err != nil {
+		return fmt.Errorf("can't create new db: %w", err)
 	}
+	contextDb := db.NewContextDb(dbClient.GormDb())
+
+	// storage
+	userDb := db.NewUserDb()
+	authDb := db.NewAuthDb()
+
+	// services
+	userService := service.NewUserService(userDb, authDb)
+	authService := service.NewAuthService(authDb, userService)
 
 	router := gin.Default()
 
-	static := router.Group("/", middleware.ServeGzippedFiles(!cfg.DevMode))
-	{
-		static.GET("/js/*filepath", middleware.ServeStaticFiles("./frontend/src/js"))
-		static.GET("/css/*filepath", middleware.ServeStaticFiles("./frontend/src/css"))
-		static.GET("/public/*filepath", middleware.ServeStaticFiles(staticBasePath))
-	}
+	// handlers
+	authHandler := handler.NewAuthHandler(router, authService, userService)
+	staticHandler := handler.NewStaticHandler(router)
+	homeHandler := handler.NewHomeHandler(router)
 
+	// static
+	staticHandler.Routes(cfg.DevMode)
+
+	// middleware
 	router.Use(middleware.CheckHTMXRequest())
+	router.Use(middleware.InjectDbHandle(contextDb))
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
 
-	router.GET("/", func(c *gin.Context) {
-		render.Render(c, 200, views.Home())
-	})
+	// Routes
+	homeHandler.Routes()
+	authHandler.Routes()
 
 	if err := router.Run(":8080"); err != nil {
 		return err

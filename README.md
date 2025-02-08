@@ -1,5 +1,13 @@
 # go-starter
 
+## TODO
+
+- [x] Create users with email
+- [x] log in with email
+- [] Handle sessions
+- [] Sign up with google and apple
+- [] Login with different providers
+
 This project functions as a starter for any webapp. It uses the stack
 
 - Gin Web Framework

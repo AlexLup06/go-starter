@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS app.user (
     CONSTRAINT user_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS app.auth_providers (
+CREATE TABLE IF NOT EXISTS app.auth_provider (
     id uuid NOT NULL,
 	created_at timestamptz NOT NULL,
 	updated_at timestamptz NOT NULL,
@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS app.auth_providers (
     provider_user_id VARCHAR(255),
     password_hash VARCHAR(255),
 
-    CONSTRAINT unique_provider_user UNIQUE (method, provider_user_id)
+    CONSTRAINT unique_provider_user UNIQUE (method, provider_user_id),
+    CONSTRAINT auth_provider_pkey PRIMARY KEY (id)
 );
 
 -- +migrate Down

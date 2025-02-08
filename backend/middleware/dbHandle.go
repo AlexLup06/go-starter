@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 
 	"alexlupatsiy.com/personal-website/backend/repository"
@@ -27,9 +26,7 @@ func InjectDbHandle(contextDb repository.ContextDb) gin.HandlerFunc {
 		hasErrors := len(c.Errors.Errors()) > 0
 
 		if hasErrors {
-			fmt.Printf("here with rollback\n")
 			if !contextDb.IsCommittedOrRolledBack(dbCtx) {
-				fmt.Printf("rolling back\n")
 				rollBackErr := contextDb.Rollback(dbCtx)
 				if rollBackErr != nil {
 					c.Status(http.StatusInternalServerError)
@@ -37,11 +34,7 @@ func InjectDbHandle(contextDb repository.ContextDb) gin.HandlerFunc {
 				}
 			}
 		} else {
-			fmt.Printf("here with commit\n")
 			if !contextDb.IsCommittedOrRolledBack(dbCtx) {
-
-				fmt.Printf("committing\n")
-
 				err = contextDb.Commit(dbCtx)
 				if err != nil {
 					c.Status(http.StatusInternalServerError)

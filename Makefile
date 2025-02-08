@@ -35,11 +35,7 @@ compress-static-files:
 connect-db:
 	$(DOCKER_COMPOSE_DEV) exec -it postgres psql -U admin -d backend
 
-new-migration-file:
-	 UID=$(UID) GID=$(GID) docker run -it --rm -v $(CWD)/migrations:/migrations \
-		gems-backend-migrations:latest sql-migrate new -config dbconfig.yaml $(name)
-
-run-tailwind:
+dev:
 	@echo "Running Tailwind CSS..."
 	@cd frontend && npx tailwindcss build -i src/css/style.css -o src/css/tailwind.css --watch
 	@echo "Tailwind CSS finished"

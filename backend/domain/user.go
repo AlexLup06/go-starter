@@ -3,6 +3,10 @@ package domain
 type User struct {
 	DefaultFields
 	Username      string         `gorm:"column:username"`
-	email         *string        `gorm:"column:email"`
+	Email         *string        `gorm:"column:email"`
 	AuthProviders []AuthProvider `gorm:"foreignKey:UserID"`
+}
+
+func (User) TableName() string {
+	return "user"
 }
