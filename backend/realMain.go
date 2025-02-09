@@ -35,17 +35,18 @@ func RealMain() error {
 	contextDb := db.NewContextDb(dbClient.GormDb())
 
 	// storage
+	sessionsDb := db.NewSessionDb()
 	userDb := db.NewUserDb()
 	authDb := db.NewAuthDb()
 
 	// services
+	sessionService := service.NewSessionService(sessionsDb, []byte(cfg.JWTKey))
 	userService := service.NewUserService(userDb, authDb)
-	authService := service.NewAuthService(authDb, userService)
-
-	router := gin.Default()
+	authService := service.NewAuthService(authDb, userService, sessionService)
 
 	// handlers
-	authHandler := handler.NewAuthHandler(router, authService, userService)
+	router := gin.Default()
+	authHandler := handler.NewAuthHandler(router, authService, userService, sessionService)
 	staticHandler := handler.NewStaticHandler(router)
 	homeHandler := handler.NewHomeHandler(router)
 
@@ -54,12 +55,12 @@ func RealMain() error {
 
 	// middleware
 	router.Use(middleware.CheckHTMXRequest())
-	router.Use(middleware.InjectDbHandle(contextDb))
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
+	dbHandleMiddleware := middleware.InjectDbHandle(contextDb)
 
 	// Routes
-	homeHandler.Routes()
-	authHandler.Routes()
+	homeHandler.Routes(dbHandleMiddleware)
+	authHandler.Routes(dbHandleMiddleware)
 
 	if err := router.Run(":8080"); err != nil {
 		return err

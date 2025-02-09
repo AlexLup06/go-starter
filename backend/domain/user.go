@@ -5,6 +5,7 @@ type User struct {
 	Username      string         `gorm:"column:username"`
 	Email         *string        `gorm:"column:email"`
 	AuthProviders []AuthProvider `gorm:"foreignKey:UserID"`
+	Sessions      []Session      `gorm:"foreignKey:UserID"`
 }
 
 func (User) TableName() string {

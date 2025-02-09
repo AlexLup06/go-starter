@@ -5,30 +5,35 @@ import (
 
 	"alexlupatsiy.com/personal-website/backend/helpers/ctxHelpers"
 	"alexlupatsiy.com/personal-website/backend/helpers/render"
+	"alexlupatsiy.com/personal-website/backend/repository"
 	"alexlupatsiy.com/personal-website/backend/service"
 	"alexlupatsiy.com/personal-website/frontend/src/views/auth"
 	"github.com/gin-gonic/gin"
 )
 
 type AuthHandler struct {
-	router      *gin.Engine
-	authService *service.AuthService
-	userService *service.UserService
+	router         *gin.Engine
+	authService    *service.AuthService
+	userService    *service.UserService
+	sessionService *service.SessionService
 }
 
-func NewAuthHandler(router *gin.Engine, authService *service.AuthService, userService *service.UserService) *AuthHandler {
+func NewAuthHandler(router *gin.Engine, authService *service.AuthService, userService *service.UserService, sessionService *service.SessionService) *AuthHandler {
 	return &AuthHandler{
-		router:      router,
-		authService: authService,
-		userService: userService,
+		router:         router,
+		authService:    authService,
+		userService:    userService,
+		sessionService: sessionService,
 	}
 }
 
-func (h *AuthHandler) Routes() {
-	h.router.GET("/auth/login", h.loginGET)
-	h.router.POST("/auth/login/:method", h.loginPOST)
-	h.router.GET("/auth/signup", h.signupGET)
-	h.router.POST("/auth/signup/:method", h.signupPOST)
+func (h *AuthHandler) Routes(dbHandleMiddleware gin.HandlerFunc) {
+	authRouter := h.router.Group("/auth", dbHandleMiddleware)
+
+	authRouter.GET("/login", h.loginGET)
+	authRouter.POST("/login/:method", h.loginPOST)
+	authRouter.GET("/signup", h.signupGET)
+	authRouter.POST("/signup/:method", h.signupPOST)
 }
 
 func (h *AuthHandler) loginGET(ctx *gin.Context) {
@@ -53,11 +58,28 @@ func (h *AuthHandler) loginPOST(ctx *gin.Context) {
 			return
 		}
 
-		err = h.authService.LoginWithEmail(ctx.Request.Context(), loginUserWithEmailRequest)
+		// login user
+		user, err := h.authService.LoginWithEmail(ctx.Request.Context(), loginUserWithEmailRequest)
 		if err != nil {
 			render.Render(ctx, 422, auth.LoginForm())
 			return
 		}
+
+		// create Refresh Token
+		refreshToken, ttl, err := h.sessionService.CreateRefreshToken(ctx.Request.Context(), user.ID)
+		if err != nil {
+			render.Render(ctx, 422, auth.LoginForm())
+			return
+		}
+		ctx.SetCookie(repository.REFRESH_COOKIE.Type, *refreshToken, int(ttl), "", "", true, true)
+
+		// create Access Token
+		accessToken, ttl, err := h.sessionService.CreateAccessToken(ctx.Request.Context(), user.ID)
+		if err != nil {
+			render.Render(ctx, 422, auth.LoginForm())
+			return
+		}
+		ctx.SetCookie(repository.ACCESS_COOKIE.Type, *accessToken, int(ttl), "", "", true, true)
 
 		ctx.Status(200)
 		return

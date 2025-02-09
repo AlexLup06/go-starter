@@ -2,11 +2,37 @@
 
 ## TODO
 
-- [x] Create users with email
-- [x] log in with email
-- [] Handle sessions
-- [] Sign up with google and apple
-- [] Login with different providers
+- ✅ Create users with email
+- ✅ log in with email
+- ⬜ Handle sessions with middleware:
+- access token (short lived and stateless)<br>
+- refresh token (long lived and saved hashed in db)<br>
+- Hash the Refresh Token<br>
+- tokens saved in two seperate HTTP-only, Secure cookies (preferably SameSite=Strict or Lax)
+- both cookies sent in each request
+- 🚀 1. High-Level Flow (Server-Side Auto-Refresh)
+  Step-by-Step Flow:<br>
+  Client makes an API request (HTMX or standard fetch).<br>
+  Server validates the access token:<br>
+  If valid → processes the request as usual.<br>
+  If expired:<br>
+  Checks for a valid refresh token (sent via HTTP-only cookie).<br>
+  If the refresh token is valid:<br>
+  Issues a new access token (and optionally rotates the refresh token).<br>
+  Fulfills the original request without sending an error to the client.<br>
+  Sends the new access token in an HTTP-only cookie along with the response.<br>
+  If the refresh token is invalid/expired:<br>
+  Responds with 401 Unauthorized (or 403 Forbidden).<br>
+
+- ⬜ Sign up with google and apple
+- ⬜ Login with different providers
+
+Access token and refresh tokens are now being created when log in.
+Need to create them when signing up
+Need to implement middleware that checks whether logged in or not
+Revoke session if no cookie found
+
+## Tech Stack
 
 This project functions as a starter for any webapp. It uses the stack
 

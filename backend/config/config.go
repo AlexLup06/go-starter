@@ -6,5 +6,6 @@ import "alexlupatsiy.com/personal-website/backend/db"
 // Like DbConfiguration, later InfluxConfiguration etc.
 type Config struct {
 	DbConfig db.Config
-	DevMode  bool `env:"DEV_MODE, default=true"`
+	DevMode  bool   `env:"DEV_MODE, default=true"`
+	JWTKey   string `env:"JWT_KEY"`
 }

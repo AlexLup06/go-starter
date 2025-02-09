@@ -1,6 +1,11 @@
 package passwords
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"crypto/sha256"
+	"fmt"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 // HashPassword will hash the password and return the hashed password and an error.
 func HashPassword(password string) (string, error) {
@@ -18,4 +23,9 @@ func IsSamePassword(password string, hashedPassword string) bool {
 	}
 
 	return true
+}
+
+func HashToken(token string) string {
+	hash := sha256.Sum256([]byte(token))
+	return fmt.Sprintf("%x", hash)
 }

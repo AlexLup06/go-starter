@@ -12,7 +12,7 @@ func NewHomeHandler(router *gin.Engine) *HomeHandler {
 	return &HomeHandler{router: router}
 }
 
-func (h *HomeHandler) Routes() {
+func (h *HomeHandler) Routes(dbHandleMiddleware gin.HandlerFunc) {
 	h.router.GET("/", h.home)
 }
 
