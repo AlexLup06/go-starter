@@ -8,8 +8,8 @@ import (
 	"alexlupatsiy.com/personal-website/backend/db"
 	"alexlupatsiy.com/personal-website/backend/handler"
 	"alexlupatsiy.com/personal-website/backend/service"
-	"github.com/gin-contrib/gzip"
 
+	"github.com/gin-contrib/gzip"
 	"github.com/sethvargo/go-envconfig"
 
 	"alexlupatsiy.com/personal-website/backend/middleware"
@@ -49,6 +49,7 @@ func RealMain() error {
 	authHandler := handler.NewAuthHandler(router, authService, userService, sessionService)
 	staticHandler := handler.NewStaticHandler(router)
 	homeHandler := handler.NewHomeHandler(router)
+	privateHandler := handler.NewPrivateHandler(router)
 
 	// static
 	staticHandler.Routes(cfg.DevMode)
@@ -57,10 +58,12 @@ func RealMain() error {
 	router.Use(middleware.CheckHTMXRequest())
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
 	dbHandleMiddleware := middleware.InjectDbHandle(contextDb)
+	enureLoggedInMiddleware := middleware.EnsureLoggedIn(sessionService)
 
 	// Routes
 	homeHandler.Routes(dbHandleMiddleware)
 	authHandler.Routes(dbHandleMiddleware)
+	privateHandler.Routes(enureLoggedInMiddleware, dbHandleMiddleware)
 
 	if err := router.Run(":8080"); err != nil {
 		return err

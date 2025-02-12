@@ -79,7 +79,7 @@ func (h *AuthHandler) loginPOST(ctx *gin.Context) {
 			render.Render(ctx, 422, auth.LoginForm())
 			return
 		}
-		ctx.SetCookie(repository.ACCESS_COOKIE.Type, *accessToken, int(ttl), "", "", true, true)
+		ctx.SetCookie(repository.ACCESS_COOKIE.Type, accessToken, int(ttl), "", "", true, true)
 
 		ctx.Status(200)
 		return

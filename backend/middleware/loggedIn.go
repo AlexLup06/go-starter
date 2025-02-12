@@ -1,25 +1,64 @@
 package middleware
 
 import (
+	"net/http"
+
+	"alexlupatsiy.com/personal-website/backend/helpers/cookie"
+	"alexlupatsiy.com/personal-website/backend/repository"
 	"alexlupatsiy.com/personal-website/backend/service"
 	"github.com/gin-gonic/gin"
 )
 
-func EnsureLoggedIn(authService *service.AuthService, sessionService *service.SessionService) gin.HandlerFunc {
+func EnsureLoggedIn(sessionService *service.SessionService) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ensureLoggedIn(ctx, authService, sessionService)
+		ensureLoggedIn(ctx, sessionService)
 		ctx.Next()
 	}
 }
 
-func ensureLoggedIn(ctx *gin.Context, authService *service.AuthService, sessionService *service.SessionService) {
-	// accessCookieString, err := ctx.Cookie(repository.ACCESS_TOKEN.Type)
-	// check if the access cookie is there. If not it means there is also no AccessToken because it is inside the cookie
-	// IF access cookie NOT present: check refresh cookie.
-	// 		IF refresh cookie NOT present: user is NOT logged in => revoke the refresh token
-	// 		IF refresh cookie IS present: user is NOT logged in => check refresh cookie and login user
+func ensureLoggedIn(ctx *gin.Context, sessionService *service.SessionService) {
+	accessCookieString, err := ctx.Cookie(repository.ACCESS_COOKIE.Type)
 
-	// IF access cookie IS present: still check expiry time and if not expired, then we are logged in; if expired then not logged
-	// 		=> DON'T invoke a new access Token. Cookie has the same TTL as the token. Therefore token most likely stolen or comprimised
+	// Case: We have no access cookie, so we check refresh cookie and generate new access token/cookie
+	if err != nil || accessCookieString == "" {
+		// check refresh token
+		refreshCookieString, err := ctx.Cookie(repository.REFRESH_COOKIE.Type)
+		if err != nil || refreshCookieString == "" {
+			ctx.String(http.StatusUnauthorized, "Refresh Cookie not Set")
+			ctx.Abort()
+			return
+		}
 
+		// check refresh token against the database
+		isExpired, userId, err := sessionService.VerifyRefreshToken(ctx.Request.Context(), refreshCookieString)
+		if isExpired || err != nil {
+			ctx.String(http.StatusUnauthorized, "Refresh Token is not valid")
+			ctx.Abort()
+			return
+		}
+
+		// refresh token alive and valid -> generate new Access Token
+		accessTokenString, ttl, err := sessionService.CreateAccessToken(ctx.Request.Context(), userId)
+		if err != nil {
+			ctx.String(http.StatusUnauthorized, "Error generating new Access token")
+			ctx.Abort()
+			return
+		}
+		cookie.SetAccessCookie(ctx, accessTokenString, ttl)
+		ctx.Next()
+		return
+	}
+
+	// Case: We have access cookie and access Token. Verify the access token.
+	// If there's something wrong with it, it has been tinkered with most likely so no new one
+	isExpired, err := sessionService.VerifyAccessToken(ctx.Request.Context(), accessCookieString)
+	if isExpired || err != nil {
+		ctx.String(http.StatusUnauthorized, "Access Token not valid")
+		ctx.Abort()
+		return
+	}
+
+	// add to Context that user is logged in
+
+	ctx.Next()
 }

@@ -4,16 +4,16 @@ CREATE TABLE IF NOT EXISTS app.session (
 	created_at timestamptz NOT NULL,
 	updated_at timestamptz NOT NULL,
 
-    user_id UUID NOT NULL REFERENCES app.user(id) ON DELETE CASCADE,  -- Link to the user
+    user_id UUID NOT NULL REFERENCES app.user(id) ON DELETE CASCADE,  
 
-    refresh_token VARCHAR(512) NOT NULL UNIQUE,           -- The refresh token (store as a hash)
-    issued_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),         -- When the token was issued
-    expires_at TIMESTAMPTZ NOT NULL,                      -- When the token expires
-    revoked BOOLEAN NOT NULL DEFAULT FALSE,               -- If the token has been revoked
+    refresh_token VARCHAR(512) NOT NULL UNIQUE,           
+    issued_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),         
+    expires_at TIMESTAMPTZ NOT NULL,                      
+    revoked BOOLEAN NOT NULL DEFAULT FALSE,               
 
-    user_agent VARCHAR(255),                              -- Optional: Track the device/browser
+    user_agent VARCHAR(255),                              
 
-    CONSTRAINT unique_token UNIQUE (token),                -- Ensure tokens are unique
+    CONSTRAINT unique_token UNIQUE (refresh_token),                
     CONSTRAINT refresh_token_pkey PRIMARY KEY (id)
 );
 

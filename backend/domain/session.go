@@ -7,7 +7,7 @@ type Session struct {
 	UserID string `gorm:"type:uuid;column:user_id"`
 	User   User   `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
 
-	RefreshToken string    `gorm:"type:varchar(512);unique;not null;column:token"`
+	RefreshToken string    `gorm:"type:varchar(512);unique;not null;column:refresh_token"`
 	IssuedAt     time.Time `gorm:"type:timestamptz;not null;default:now()"`
 	ExpiresAt    time.Time `gorm:"type:timestamptz;not null"`
 	Revoked      bool      `gorm:"not null;default:false"`
