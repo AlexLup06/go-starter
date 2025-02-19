@@ -39,6 +39,12 @@ func (h *AuthHandler) Routes(dbHandleMiddleware gin.HandlerFunc) {
 }
 
 func (h *AuthHandler) loginGET(ctx *gin.Context) {
+	weekLoggedIn := ctxHelpers.IsWeekLoggedInCtx(ctx.Request.Context())
+	if weekLoggedIn {
+		ctx.Writer.Header().Set("HX-Redirect", "/private")
+		ctx.Status(http.StatusNoContent)
+		return
+	}
 	render.Render(ctx, 200, auth.Login())
 }
 
@@ -105,8 +111,14 @@ func (h *AuthHandler) loginWithEmail(ctx *gin.Context) {
 	return
 }
 
-func (h *AuthHandler) signupGET(c *gin.Context) {
-	render.Render(c, 200, auth.Signup())
+func (h *AuthHandler) signupGET(ctx *gin.Context) {
+	weekLoggedIn := ctxHelpers.IsWeekLoggedInCtx(ctx.Request.Context())
+	if weekLoggedIn {
+		ctx.Writer.Header().Set("HX-Redirect", "/private")
+		ctx.Status(http.StatusNoContent)
+		return
+	}
+	render.Render(ctx, 200, auth.Signup())
 }
 
 func (h *AuthHandler) signupPOST(ctx *gin.Context) {
