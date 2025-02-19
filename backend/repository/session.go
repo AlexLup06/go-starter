@@ -13,6 +13,7 @@ type SessionStorage interface {
 	GetSessionByUserId(ctx context.Context, sessionId string) (domain.Session, error)
 	RevokeSession(ctx context.Context, sessionId string) error
 	RevokeAllSessions(ctx context.Context, userId string) error
+	ValidateRefreshToken(ctx context.Context, hashedRefreshToken string, userId string) (bool, error)
 }
 
 type CookieType struct {

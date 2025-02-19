@@ -36,7 +36,7 @@ func (u *userDb) CreateUser(ctx context.Context, user domain.User, authProvider 
 		return domain.User{}, err
 	}
 
-	return existingUser, nil
+	return user, nil
 }
 
 func (u *userDb) GetUserByEmail(ctx context.Context, email string) (domain.User, error) {

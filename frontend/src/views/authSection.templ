@@ -1,0 +1,30 @@
+package views
+
+import "alexlupatsiy.com/personal-website/backend/helpers/ctxHelpers"
+
+templ AuthSection() {
+	<div class="flex gap-4 items-center">
+		if username,ok:=ctxHelpers.UsernameCtx(ctx);ok {
+			Hello: { username }
+		}
+		if ctxHelpers.IsWeekLoggedInCtx(ctx) {
+			<button
+				class="bg-grey-200 py-2 px-4 rounded-lg"
+				hx-post="/auth/logout"
+				hx-target="body"
+				hx-push-url="true"
+			>
+				Log Out
+			</button>
+		} else {
+			<button
+				class="bg-grey-200 py-2 px-4 rounded-lg"
+				hx-get="/auth/login"
+				hx-target="body"
+				hx-push-url="true"
+			>
+				Log In
+			</button>
+		}
+	</div>
+}

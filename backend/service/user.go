@@ -24,10 +24,10 @@ type SignUpWithEmailRequest struct {
 	Password string `form:"password" binding:"required"`
 }
 
-func (u *UserService) CreateUserWithEmail(ctx context.Context, request SignUpWithEmailRequest) error {
+func (u *UserService) CreateUserWithEmail(ctx context.Context, request SignUpWithEmailRequest) (UserInfo, error) {
 	hashedPassword, err := passwords.HashPassword(request.Password)
 	if err != nil {
-		return fmt.Errorf("error hashing the user's password: %w", err)
+		return UserInfo{}, fmt.Errorf("error hashing the user's password: %w", err)
 	}
 
 	emailAuthProvider := domain.AuthProvider{
@@ -35,33 +35,39 @@ func (u *UserService) CreateUserWithEmail(ctx context.Context, request SignUpWit
 		PasswordHash: &hashedPassword,
 	}
 	user := domain.User{
-		Username: "Alex", // TODO: Generate Random Username
+		// TODO: Generate Random Username
+		Username: "Alex",
 		Email:    &request.Email,
 		AuthProviders: []domain.AuthProvider{
 			emailAuthProvider,
 		},
 	}
 
-	existingUser, err := u.userStorage.CreateUser(ctx, user, emailAuthProvider)
+	createdUser, err := u.userStorage.CreateUser(ctx, user, emailAuthProvider)
+	userInfo := UserInfo{
+		UserId:   createdUser.ID,
+		Username: createdUser.Username,
+		Email:    *createdUser.Email,
+	}
 	if err == nil {
-		return nil
+		return userInfo, nil
 	}
 
-	// user signed up with social login and now wants to create password login
+	// user signed up with social login and email exists and now wants to create password login
 	if err == customErrors.ErrEmailExists {
-		err = u.authStorage.CreateAuthProvider(ctx, emailAuthProvider, existingUser.ID)
+		err = u.authStorage.CreateAuthProvider(ctx, emailAuthProvider, createdUser.ID)
 		if err != nil {
 			// the auth provider already exists for the email
-			return err
+			return UserInfo{}, err
 		}
-		return nil
+		return UserInfo{}, nil
 	}
 
 	if err == customErrors.ErrEmailAndProviderExist {
-		return customErrors.NewValidationError(fmt.Sprintf("user %q already exists with the provider", *user.Email))
+		return UserInfo{}, customErrors.NewValidationError(fmt.Sprintf("user %q already exists with the provider", *user.Email))
 	}
 
-	return err
+	return userInfo, err
 }
 
 func (u *UserService) GetUserByEmail(ctx context.Context, email string) (domain.User, error) {

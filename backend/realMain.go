@@ -55,10 +55,15 @@ func RealMain() error {
 	staticHandler.Routes(cfg.DevMode)
 
 	// middleware
-	router.Use(middleware.CheckHTMXRequest())
-	router.Use(gzip.Gzip(gzip.DefaultCompression))
+	gzipMiddleware := gzip.Gzip(gzip.DefaultCompression)
 	dbHandleMiddleware := middleware.InjectDbHandle(contextDb)
 	enureLoggedInMiddleware := middleware.EnsureLoggedIn(sessionService)
+	checkHTMXMiddleware := middleware.CheckHTMXRequest()
+	setUserInfoMiddleware := middleware.SetUserInfo(sessionService)
+
+	router.Use(checkHTMXMiddleware)
+	router.Use(gzipMiddleware)
+	router.Use(setUserInfoMiddleware)
 
 	// Routes
 	homeHandler.Routes(dbHandleMiddleware)

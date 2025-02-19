@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 
-	"alexlupatsiy.com/personal-website/backend/domain"
 	customErrors "alexlupatsiy.com/personal-website/backend/helpers/errors"
 	"alexlupatsiy.com/personal-website/backend/helpers/passwords"
 	"alexlupatsiy.com/personal-website/backend/repository"
@@ -24,21 +23,27 @@ func NewAuthService(authStorage repository.AuthStorage, userService *UserService
 	return &AuthService{authStorage: authStorage, userService: userService, sessionService: sessionService}
 }
 
-func (a *AuthService) LoginWithEmail(ctx context.Context, request LoginWithEmailRequest) (domain.User, error) {
+func (a *AuthService) LoginWithEmail(ctx context.Context, request LoginWithEmailRequest) (UserInfo, error) {
 	user, err := a.userService.GetUserByEmail(ctx, request.Email)
 	if err != nil {
-		return domain.User{}, err
+		return UserInfo{}, err
 	}
 
 	emailAuth, err := a.authStorage.GetAuthProvider(ctx, user.ID, repository.METHOD_EMAIL)
 	if err != nil {
 		// the auth provider "email" does not exist
-		return domain.User{}, err
+		return UserInfo{}, err
 	}
 
 	if !passwords.IsSamePassword(request.Password, *emailAuth.PasswordHash) {
-		return domain.User{}, customErrors.NewUnauthorizedError("invalid password")
+		return UserInfo{}, customErrors.NewUnauthorizedError("invalid password")
 	}
 
-	return user, nil
+	userInfo := UserInfo{
+		UserId:   user.ID,
+		Username: user.Username,
+		Email:    *user.Email,
+	}
+
+	return userInfo, nil
 }

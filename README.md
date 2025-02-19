@@ -5,10 +5,11 @@
 - ✅ Create users with email
 - ✅ log in with email
 - ✅ Handle sessions with middleware
+- ✅ Log out functionality
 - ⬜ Add redirects if not able the autheticate user
 - ⬜ Polish Code
-- ⬜ Sign up with google and apple
-- ⬜ Login with different providers
+- ⬜ Signup with google and apple
+- ⬜ Login with google and apple
 
 ## Tech Stack
 

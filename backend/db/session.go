@@ -94,3 +94,22 @@ func (c *sessionDb) RevokeAllSessions(ctx context.Context, userId string) error 
 
 	return nil
 }
+
+func (s *sessionDb) ValidateRefreshToken(ctx context.Context, hashedRefreshToken string, userId string) (bool, error) {
+	db, err := getContextDb(ctx)
+	if err != nil {
+		return false, err
+	}
+	var session domain.Session
+	err = db.Model(&domain.Session{}).
+		Where("user_id = ? AND refresh_token = ? AND revoked = false AND expires_at > NOW()", userId, hashedRefreshToken).
+		First(&session).Error
+
+	if err != nil {
+		// if err == gorm.ErrRecordNotFound {
+		// 	return false, nil
+		// }
+		return false, err
+	}
+	return true, nil
+}
