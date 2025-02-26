@@ -75,7 +75,7 @@ func (c *sessionDb) RevokeSession(ctx context.Context, sessionId string) error {
 		return err
 	}
 
-	err = db.Model(domain.Session{}).Where("id = ?", sessionId).Update("revoked", true).Error
+	err = db.Model(&domain.Session{}).Where("id = ?", sessionId).Update("revoked", true).Error
 	if err != nil {
 		return err
 	}

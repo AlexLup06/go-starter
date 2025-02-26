@@ -25,7 +25,7 @@ func ensureLoggedIn(ctx *gin.Context, sessionService *service.SessionService) {
 		// check refresh token
 		refreshCookieString, err := ctx.Cookie(repository.REFRESH_COOKIE.Type)
 		if err != nil || refreshCookieString == "" {
-			ctx.String(http.StatusUnauthorized, "Refresh Cookie not Set")
+			ctx.Redirect(http.StatusFound, "/auth/login")
 			ctx.Abort()
 			return
 		}
@@ -33,7 +33,8 @@ func ensureLoggedIn(ctx *gin.Context, sessionService *service.SessionService) {
 		// check refresh token against the database
 		isValid, user, err := sessionService.VerifyRefreshToken(ctx.Request.Context(), refreshCookieString)
 		if !isValid || err != nil {
-			ctx.String(http.StatusUnauthorized, "Refresh Token is not valid")
+			// ctx.String(http.StatusUnauthorized, "Refresh Token is not valid")
+			ctx.Redirect(http.StatusFound, "/auth/login")
 			ctx.Abort()
 			return
 		}
@@ -41,7 +42,8 @@ func ensureLoggedIn(ctx *gin.Context, sessionService *service.SessionService) {
 		// refresh token alive and valid -> generate new Access Token
 		accessTokenString, ttl, err := sessionService.CreateAccessToken(ctx.Request.Context(), user)
 		if err != nil {
-			ctx.String(http.StatusUnauthorized, "Error generating new Access token")
+			// ctx.String(http.StatusUnauthorized, "Error generating new Access token")
+			ctx.Redirect(http.StatusFound, "/auth/login")
 			ctx.Abort()
 			return
 		}
@@ -52,9 +54,10 @@ func ensureLoggedIn(ctx *gin.Context, sessionService *service.SessionService) {
 
 	// Case: We have access cookie and access Token. Verify the access token.
 	// If there's something wrong with it, it has been tinkered with most likely so no new one
-	isExpired, userId, err := sessionService.VerifyAccessToken(ctx.Request.Context(), accessCookieString)
-	if isExpired || err != nil {
-		ctx.String(http.StatusUnauthorized, "Access Token not valid")
+	isValid, userId, err := sessionService.VerifyAccessToken(ctx.Request.Context(), accessCookieString)
+	if !isValid || err != nil {
+		// ctx.String(http.StatusUnauthorized, "Access Token not valid")
+		ctx.Redirect(http.StatusFound, "/auth/login")
 		ctx.Abort()
 		return
 	}

@@ -3,13 +3,15 @@ package customErrors
 import "errors"
 
 var (
-	ErrRecordNotFound           = errors.New("record not found")
-	ErrDuplicatedKey            = errors.New("duplicated key not allowed")
-	ErrEmailAndProviderExist    = errors.New("email with the provider already exists")
-	ErrEmailExists              = errors.New("email exists")
-	ErrAuthProviderExists       = errors.New("Auth provider already exists for the email")
-	ErrAuthProviderDoesNotExist = errors.New("The auth Provider does not exist")
-	ErrUserDoesNotExist         = errors.New("user does not exist")
+	ErrRecordNotFound              = errors.New("record not found")
+	ErrDuplicatedKey               = errors.New("duplicated key not allowed")
+	ErrEmailAndProviderExist       = errors.New("email with the provider already exists")
+	ErrEmailExists                 = errors.New("email exists")
+	ErrAuthProviderExists          = errors.New("Auth provider already exists for the email")
+	ErrAuthProviderDoesNotExist    = errors.New("The auth Provider does not exist")
+	ErrUserDoesNotExist            = errors.New("user does not exist")
+	ErrGeneratedTooManyResetTokens = errors.New("Generated too many reset password tokens")
+	ErrPasswordResetTokenNotValid  = errors.New("Password Reset Token not valid")
 )
 
 type baseErr struct {

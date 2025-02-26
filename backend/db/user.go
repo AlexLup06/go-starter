@@ -57,7 +57,3 @@ func (u *userDb) GetUserByEmail(ctx context.Context, email string) (domain.User,
 func (c *userDb) DeleteUser(ctx context.Context, id string) error {
 	return nil
 }
-
-// func (c *userDb) UpdateUser(ctx context.Context, request repository.UpdateUser) error {
-// 	return nil
-// }

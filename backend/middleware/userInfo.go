@@ -15,15 +15,15 @@ func SetUserInfo(sessionService *service.SessionService) gin.HandlerFunc {
 			return
 		}
 
-		refreshToken, err := sessionService.ParseJWT(refreshCookieString)
+		userInfo, err := sessionService.ParseUserInfo(refreshCookieString)
 		if err != nil {
 			ctx.Next()
 			return
 		}
 
 		// give global access to Username and Email; for example for navbar to always show username without hard checking the refresh token
-		userInfoContext := ctxHelpers.WithUsernameCtx(ctx.Request.Context(), refreshToken.Username)
-		userInfoContext = ctxHelpers.WithEmailCtx(userInfoContext, refreshToken.Email)
+		userInfoContext := ctxHelpers.WithUsernameCtx(ctx.Request.Context(), userInfo.Username)
+		userInfoContext = ctxHelpers.WithEmailCtx(userInfoContext, userInfo.Email)
 		userInfoContext = ctxHelpers.WithIsWeekLoggedInCtx(userInfoContext)
 		ctx.Request = ctx.Request.WithContext(userInfoContext)
 

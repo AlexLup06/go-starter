@@ -33,6 +33,8 @@ services:
       postgres:
         condition: service_healthy
     restart: on-failure:3
+    volumes:
+      - ./migrations:/migrations
 
   server:
     build:

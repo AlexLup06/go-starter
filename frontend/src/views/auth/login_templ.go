@@ -93,7 +93,7 @@ func login() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"mt-3\"><p>Don't have an Account?  <a hx-get=\"/auth/signup\" hx-target=\"body\" hx-push-url=\"true\" class=\"cursor-pointer underline\">Sign Up</a>!</p></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"mt-3\"><p>Forgot your password?  <a hx-get=\"/auth/request-password-reset\" hx-target=\"body\" hx-push-url=\"true\" class=\"cursor-pointer underline\">Reset Password</a>!</p><p>Don't have an Account?  <a hx-get=\"/auth/signup\" hx-target=\"body\" hx-push-url=\"true\" class=\"cursor-pointer underline\">Sign Up</a>!</p></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -156,7 +156,7 @@ func LoginForm() templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(ctx.Value("email").(string))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/src/views/auth/login.templ`, Line: 59, Col: 39}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/src/views/auth/login.templ`, Line: 70, Col: 39}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -179,7 +179,7 @@ func LoginForm() templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(ctx.Value("password").(string))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/src/views/auth/login.templ`, Line: 72, Col: 42}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/src/views/auth/login.templ`, Line: 83, Col: 42}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {

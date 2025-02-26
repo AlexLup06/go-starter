@@ -57,3 +57,17 @@ func (a *authDb) GetAuthProvider(ctx context.Context, userId string, method repo
 
 	return authProvider, nil
 }
+
+func (a *authDb) UpdateUserPassword(ctx context.Context, userId string, hashedPassword string) error {
+	db, err := getContextDb(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = db.Model(&domain.AuthProvider{}).Where("user_id = ?", userId).Update("password_hash", hashedPassword).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

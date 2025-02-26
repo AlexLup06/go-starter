@@ -26,6 +26,17 @@ templ login() {
 		@LoginForm()
 		<div class="mt-3">
 			<p>
+				Forgot your password? 
+				<a
+					hx-get="/auth/request-password-reset"
+					hx-target="body"
+					hx-push-url="true"
+					class="cursor-pointer underline"
+				>
+					Reset Password
+				</a>!
+			</p>
+			<p>
 				Don't have an Account? 
 				<a
 					hx-get="/auth/signup"

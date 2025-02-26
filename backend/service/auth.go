@@ -13,14 +13,23 @@ type LoginWithEmailRequest struct {
 	Password string `form:"password" binding:"required"`
 }
 
-type AuthService struct {
-	authStorage    repository.AuthStorage
-	userService    *UserService
-	sessionService *SessionService
+type RequestPasswordResetRequest struct {
+	Email string `form:"email" binding:"required,email"`
 }
 
-func NewAuthService(authStorage repository.AuthStorage, userService *UserService, sessionService *SessionService) *AuthService {
-	return &AuthService{authStorage: authStorage, userService: userService, sessionService: sessionService}
+type ResetPasswordRequest struct {
+	Password string `form:"password" binding:"required"`
+	Token    string `form:"token" binding:"required"`
+}
+
+type AuthService struct {
+	authStorage  repository.AuthStorage
+	userService  *UserService
+	tokenService *TokenService
+}
+
+func NewAuthService(authStorage repository.AuthStorage, userService *UserService, tokenService *TokenService) *AuthService {
+	return &AuthService{authStorage: authStorage, userService: userService, tokenService: tokenService}
 }
 
 func (a *AuthService) LoginWithEmail(ctx context.Context, request LoginWithEmailRequest) (UserInfo, error) {
@@ -46,4 +55,16 @@ func (a *AuthService) LoginWithEmail(ctx context.Context, request LoginWithEmail
 	}
 
 	return userInfo, nil
+}
+
+func (a *AuthService) UpdateUserPassword(ctx context.Context, userId string, resetPasswordRequest ResetPasswordRequest) error {
+	hashedPassword, err := passwords.HashPassword(resetPasswordRequest.Password)
+	if err != nil {
+		return err
+	}
+	err = a.authStorage.UpdateUserPassword(ctx, userId, hashedPassword)
+	if err != nil {
+		return err
+	}
+	return nil
 }

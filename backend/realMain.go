@@ -35,18 +35,22 @@ func RealMain() error {
 	contextDb := db.NewContextDb(dbClient.GormDb())
 
 	// storage
+	passwordResetDb := db.NewPasswordResetDb()
 	sessionsDb := db.NewSessionDb()
 	userDb := db.NewUserDb()
 	authDb := db.NewAuthDb()
 
 	// services
-	sessionService := service.NewSessionService(sessionsDb, []byte(cfg.JWTKey))
+	tokenService := service.NewTokenService([]byte(cfg.JWTKey))
+	mailService := service.NewMailService(cfg.SendGridKey)
+	sessionService := service.NewSessionService(sessionsDb, tokenService)
 	userService := service.NewUserService(userDb, authDb)
-	authService := service.NewAuthService(authDb, userService, sessionService)
+	authService := service.NewAuthService(authDb, userService, tokenService)
+	passwordResetService := service.NewPasswordResetService(passwordResetDb, userService, tokenService, mailService)
 
 	// handlers
 	router := gin.Default()
-	authHandler := handler.NewAuthHandler(router, authService, userService, sessionService)
+	authHandler := handler.NewAuthHandler(router, authService, userService, sessionService, passwordResetService)
 	staticHandler := handler.NewStaticHandler(router)
 	homeHandler := handler.NewHomeHandler(router)
 	privateHandler := handler.NewPrivateHandler(router)
@@ -56,9 +60,9 @@ func RealMain() error {
 
 	// middleware
 	gzipMiddleware := gzip.Gzip(gzip.DefaultCompression)
+	checkHTMXMiddleware := middleware.CheckHTMXRequest()
 	dbHandleMiddleware := middleware.InjectDbHandle(contextDb)
 	enureLoggedInMiddleware := middleware.EnsureLoggedIn(sessionService)
-	checkHTMXMiddleware := middleware.CheckHTMXRequest()
 	setUserInfoMiddleware := middleware.SetUserInfo(sessionService)
 
 	router.Use(checkHTMXMiddleware)

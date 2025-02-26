@@ -8,7 +8,7 @@ require (
 	github.com/a-h/templ v0.3.819
 	github.com/gin-contrib/gzip v1.2.2
 	github.com/gin-gonic/gin v1.10.0
-	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/jackc/pgx/v5 v5.7.2
 	gorm.io/gorm v1.25.10
 )

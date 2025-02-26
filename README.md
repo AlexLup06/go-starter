@@ -6,7 +6,8 @@
 - ✅ log in with email
 - ✅ Handle sessions with middleware
 - ✅ Log out functionality
-- ⬜ Add redirects if not able the autheticate user
+- ✅ Add redirects if not able the autheticate user
+- ✅ Reset password with Email
 - ⬜ Polish Code
 - ⬜ Signup with google and apple
 - ⬜ Login with google and apple
