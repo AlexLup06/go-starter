@@ -22,7 +22,8 @@ var (
 )
 
 type UserStorage interface {
-	CreateUser(ctx context.Context, user domain.User, authProvider domain.AuthProvider) (domain.User, error)
+	CreateUser(ctx context.Context, user domain.User) (domain.User, error)
 	DeleteUser(ctx context.Context, id string) error
 	GetUserByEmail(ctx context.Context, email string) (domain.User, error)
+	UpdateUserEmail(ctx context.Context, userId, email string) error
 }

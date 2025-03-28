@@ -45,7 +45,7 @@ func RealMain() error {
 	mailService := service.NewMailService(cfg.SendGridKey)
 	sessionService := service.NewSessionService(sessionsDb, tokenService)
 	userService := service.NewUserService(userDb, authDb)
-	authService := service.NewAuthService(authDb, userService, tokenService)
+	authService := service.NewAuthService(authDb, userService, tokenService, cfg.GoogleClientId)
 	passwordResetService := service.NewPasswordResetService(passwordResetDb, userService, tokenService, mailService)
 
 	// handlers

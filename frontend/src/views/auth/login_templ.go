@@ -85,7 +85,15 @@ func login() templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"absolute bg-grey-100 rounded-3xl left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 py-16 px-20\"><div class=\"text-3xl mb-6\">Log In</div><div class=\"flex gap-2\"><button class=\"w-1/2 bg-grey-200 py-2 px-4 rounded-xl ml-auto\">Apple</button> <button class=\"w-1/2 bg-grey-200 py-2 px-4 rounded-xl ml-auto\">Google</button></div><div class=\"relative flex justify-center my-3\"><p class=\"bg-grey-100 px-2\">or</p><div class=\"absolute w-full top-1/2 -translate-y-1/2 left 0 h-0.5 bg-grey-200 -z-10\"></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"absolute bg-grey-100 rounded-3xl left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 py-16 px-20\"><div class=\"text-3xl mb-6\">Log In</div><div class=\"flex gap-2\"><button class=\"w-1/2 bg-grey-200 py-2 px-4 rounded-xl ml-auto\">Apple</button>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = googleSignIn().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div><div class=\"relative flex justify-center my-3\"><p class=\"bg-grey-100 px-2\">or</p><div class=\"absolute w-full top-1/2 -translate-y-1/2 left 0 h-0.5 bg-grey-200 -z-10\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -93,7 +101,7 @@ func login() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"mt-3\"><p>Forgot your password?  <a hx-get=\"/auth/request-password-reset\" hx-target=\"body\" hx-push-url=\"true\" class=\"cursor-pointer underline\">Reset Password</a>!</p><p>Don't have an Account?  <a hx-get=\"/auth/signup\" hx-target=\"body\" hx-push-url=\"true\" class=\"cursor-pointer underline\">Sign Up</a>!</p></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"mt-3\"><p>Forgot your password?  <a hx-get=\"/auth/request-password-reset\" hx-target=\"body\" hx-push-url=\"true\" class=\"cursor-pointer underline\">Reset Password</a>!</p><p>Don't have an Account?  <a hx-get=\"/auth/signup\" hx-target=\"body\" hx-push-url=\"true\" class=\"cursor-pointer underline\">Sign Up</a>!</p></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -122,7 +130,7 @@ func LoginForm() templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<form hx-post=\"/auth/login/email\" hx-target=\"this\" hx-swap=\"outerHTML\" hx-on=\"htmx:beforeSwap: if(event.detail.xhr.status === 200) { window.location.href = &#39;/&#39;; }\"><label for=\"email\">Email:</label><br>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<form hx-post=\"/auth/login\" hx-target=\"this\" hx-swap=\"outerHTML\" hx-on=\"htmx:beforeSwap: if(event.detail.xhr.status === 200) { window.location.href = &#39;/&#39;; }\"><label for=\"email\">Email:</label><br>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -131,7 +139,7 @@ func LoginForm() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<input type=\"text\" id=\"email\" name=\"email\" required class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<input type=\"text\" id=\"email\" name=\"email\" required class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -144,12 +152,12 @@ func LoginForm() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if ctx.Value("isWrongEmail") == "true" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, " value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, " value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -162,17 +170,17 @@ func LoginForm() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "><br><label for=\"password\">Password:</label><br><input type=\"text\" id=\"password\" name=\"password\" required class=\"bg-grey-200 rounded-lg px-2\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "><br><label for=\"password\">Password:</label><br><input type=\"text\" id=\"password\" name=\"password\" required class=\"bg-grey-200 rounded-lg px-2\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if ctx.Value("isWrongEmail") == "true" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, " value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, " value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -185,12 +193,41 @@ func LoginForm() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "><br><button type=\"submit\" class=\"bg-grey-200 rounded-xl px-4 py-2 mt-3\">Log In</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "><br><button type=\"submit\" class=\"bg-grey-200 rounded-xl px-4 py-2 mt-3\">Log In</button></form>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func googleSignIn() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var9 == nil {
+			templ_7745c5c3_Var9 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<script src=\"https://accounts.google.com/gsi/client\" async></script><div id=\"g_id_onload\" data-client_id=\"672422627419-436pouhafc549n2vvghocabbsih1bf5g.apps.googleusercontent.com\" data-login_uri=\"http://localhost:3000/auth/google\" data-auto_prompt=\"false\"></div><div class=\"g_id_signin\" data-type=\"standard\" data-size=\"large\" data-theme=\"outline\" data-text=\"sign_in_with\" data-shape=\"rectangular\" data-logo_alignment=\"left\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

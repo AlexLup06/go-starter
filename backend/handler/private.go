@@ -13,7 +13,7 @@ func NewPrivateHandler(router *gin.Engine) PrivateHandler {
 }
 
 func (p *PrivateHandler) Routes(ensureLoggedInMiddleware gin.HandlerFunc, dbHandleMiddleware gin.HandlerFunc) {
-	private := p.router.Group("/private", ensureLoggedInMiddleware, dbHandleMiddleware)
+	private := p.router.Group("/private", dbHandleMiddleware, ensureLoggedInMiddleware)
 	private.GET("", p.private)
 }
 

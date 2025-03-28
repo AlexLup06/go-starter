@@ -8,9 +8,11 @@
 - ✅ Log out functionality
 - ✅ Add redirects if not able the autheticate user
 - ✅ Reset password with Email
+- ✅ Signup with google and apple
 - ⬜ Polish Code
-- ⬜ Signup with google and apple
 - ⬜ Login with google and apple
+
+- ⬜ Implement proper caching of CSS and JS files.
 
 ## Tech Stack
 
@@ -21,7 +23,7 @@ This project functions as a starter for any webapp. It uses the stack
 - Typescript
 - Tailwind CSS
 
-For Bundeling, Minifying and Compiling TS to JS I use Webpack.
+For Bundeling, Minifying and Compiling TS to JS it uses Webpack.
 It also uses Docker. There is a make file which starts the whole stack in development and production mode.
 
 ## Backend architecture

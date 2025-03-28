@@ -74,13 +74,15 @@ func (s *SessionService) VerifyRefreshToken(ctx context.Context, refreshTokenStr
 	hashedRefreshToken := passwords.HashToken(refreshTokenString)
 
 	isValid, err := s.sessionStorage.ValidateRefreshToken(ctx, hashedRefreshToken, refreshToken.Extra.UserId)
+	if err != nil {
+		return false, UserInfo{}, err
+	}
 
 	userInfo := UserInfo{
 		UserId:   refreshToken.Extra.UserId,
 		Username: refreshToken.Extra.Username,
 		Email:    refreshToken.Extra.Email,
 	}
-
 	return isValid, userInfo, nil
 }
 

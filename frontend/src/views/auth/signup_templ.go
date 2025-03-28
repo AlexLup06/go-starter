@@ -122,7 +122,7 @@ func SignupForm() templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<form x-cloak x-show=\"open\" hx-post=\"/auth/signup/email\" hx-target=\"this\" hx-swap=\"outerHTML\" hx-on=\"htmx:beforeSwap: if(event.detail.xhr.status === 200) { window.location.href = &#39;/&#39;; }\"><label for=\"email\">Email:</label><br>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<form x-cloak x-show=\"open\" hx-post=\"/auth/signup\" hx-target=\"this\" hx-swap=\"outerHTML\" hx-on=\"htmx:beforeSwap: if(event.detail.xhr.status === 200) { window.location.href = &#39;/&#39;; }\"><label for=\"email\">Email:</label><br>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

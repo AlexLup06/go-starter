@@ -14,8 +14,13 @@ func NewHomeHandler(router *gin.Engine) *HomeHandler {
 
 func (h *HomeHandler) Routes(dbHandleMiddleware gin.HandlerFunc) {
 	h.router.GET("/", h.home)
+	h.router.GET("/test", h.test)
 }
 
 func (h *HomeHandler) home(ctx *gin.Context) {
 	render.Render(ctx, 200, views.Home())
+}
+
+func (h HomeHandler) test(ctx *gin.Context) {
+	render.Render(ctx, 200, views.Test())
 }

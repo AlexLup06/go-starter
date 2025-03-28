@@ -14,19 +14,17 @@ func NewAuthDb() repository.AuthStorage {
 	return &authDb{}
 }
 
-func (a *authDb) CreateAuthProvider(ctx context.Context, authProvider domain.AuthProvider, userId string) error {
+func (a *authDb) CreateAuthProvider(ctx context.Context, authProvider domain.AuthProvider) error {
 	db, err := getContextDb(ctx)
 	if err != nil {
 		return err
 	}
-	var authProviders []domain.AuthProvider
-	err = db.Model(domain.AuthProvider{}).Where("user_id = ?", userId).Find(&authProviders).Error
-
+	var usersAuthProviders []domain.AuthProvider
+	err = db.Model(domain.AuthProvider{}).Where("user_id = ?", authProvider.UserID).Find(&usersAuthProviders).Error
 	if err == nil {
-		for _, authProvider := range authProviders {
-			// TODO: make geneal
-			if authProvider.Method == repository.METHOD_EMAIL.Method {
-				return customErrors.ErrEmailAndProviderExist
+		for _, uasersAP := range usersAuthProviders {
+			if authProvider.Method == uasersAP.Method {
+				return customErrors.ErrUserWithAuthProviderExist
 			}
 		}
 	}
@@ -34,22 +32,34 @@ func (a *authDb) CreateAuthProvider(ctx context.Context, authProvider domain.Aut
 	err = db.Model(domain.AuthProvider{}).Create(&authProvider).Error
 
 	if err != nil {
-		if customErrors.IsUniqueConstraintViolationError(err) {
-			return customErrors.ErrEmailAndProviderExist
-		}
 		return err
 	}
 
 	return nil
 }
 
-func (a *authDb) GetAuthProvider(ctx context.Context, userId string, method repository.CreateUserMethod) (domain.AuthProvider, error) {
+func (a *authDb) GetAuthProviderByUserId(ctx context.Context, userId string, method repository.CreateUserMethod) (domain.AuthProvider, error) {
 	db, err := getContextDb(ctx)
 	if err != nil {
 		return domain.AuthProvider{}, err
 	}
 	var authProvider domain.AuthProvider
 	err = db.Model(domain.AuthProvider{}).Where("user_id = ?", userId).Where("method = ?", method.Method).First(&authProvider).Error
+
+	if err != nil {
+		return domain.AuthProvider{}, customErrors.ErrAuthProviderDoesNotExist
+	}
+
+	return authProvider, nil
+}
+
+func (a *authDb) GetAuthProviderByProviderId(ctx context.Context, providerId string, method repository.CreateUserMethod) (domain.AuthProvider, error) {
+	db, err := getContextDb(ctx)
+	if err != nil {
+		return domain.AuthProvider{}, err
+	}
+	var authProvider domain.AuthProvider
+	err = db.Model(domain.AuthProvider{}).Where("provider_user_id = ?", providerId).Where("method = ?", method.Method).First(&authProvider).Error
 
 	if err != nil {
 		return domain.AuthProvider{}, customErrors.ErrAuthProviderDoesNotExist

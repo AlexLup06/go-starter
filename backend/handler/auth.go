@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -42,45 +43,34 @@ func (h *AuthHandler) Routes(dbHandleMiddleware gin.HandlerFunc) {
 	authRouter := h.router.Group("/auth", dbHandleMiddleware)
 
 	authRouter.GET("/login", h.loginGET)
-	authRouter.POST("/login/:method", h.loginPOST)
+	authRouter.POST("/login", h.loginWithEmailPOST)
+	authRouter.POST("/apple", h.signinWithApplePOST)
+	authRouter.POST("/google", h.signinWithGooglePOST)
+
 	authRouter.GET("/signup", h.signupGET)
-	authRouter.POST("/signup/:method", h.signupPOST)
+	authRouter.POST("/signup", h.signupWithEmailPOST)
 	authRouter.POST("/logout", h.logoutPOST)
+
 	authRouter.GET("/request-password-reset", h.requestPasswordResetGET)
 	authRouter.POST("/request-password-reset", h.requestPasswordResetPOST)
+
 	authRouter.GET("/reset-password", h.resetPasswordGET)
 	authRouter.POST("/reset-password", h.resetPasswordPOST)
+
 	authRouter.GET("/successfull-password-reset", h.successfullPasswordResetGET)
 }
 
 func (h *AuthHandler) loginGET(ctx *gin.Context) {
 	weekLoggedIn := ctxHelpers.IsWeekLoggedInCtx(ctx.Request.Context())
 	if weekLoggedIn {
+		fmt.Println("we are week logged in")
 		ctx.Redirect(http.StatusFound, "/private")
 		return
 	}
 	render.Render(ctx, 200, auth.Login())
 }
 
-func (h *AuthHandler) loginPOST(ctx *gin.Context) {
-	method := ctx.Param("method")
-	switch method {
-	case "email":
-		h.loginWithEmail(ctx)
-		return
-	case "apple":
-		ctx.Status(200)
-		return
-	case "google":
-		ctx.Status(200)
-		return
-	default:
-		ctx.Status(404)
-		return
-	}
-}
-
-func (h *AuthHandler) loginWithEmail(ctx *gin.Context) {
+func (h *AuthHandler) loginWithEmailPOST(ctx *gin.Context) {
 	var loginUserWithEmailRequest service.LoginWithEmailRequest
 	err := ctx.ShouldBind(&loginUserWithEmailRequest)
 	if err != nil {
@@ -108,7 +98,6 @@ func (h *AuthHandler) loginWithEmail(ctx *gin.Context) {
 		render.Render(ctx, http.StatusUnprocessableEntity, auth.LoginForm())
 		return
 	}
-	// ctx.SetCookie(repository.ACCESS_COOKIE.Type, refreshToken, int(ttl), "", "", true, true)
 	cookie.SetCookie(ctx, refreshToken, repository.REFRESH_COOKIE, ttl)
 
 	// create Access Token
@@ -117,11 +106,103 @@ func (h *AuthHandler) loginWithEmail(ctx *gin.Context) {
 		render.Render(ctx, http.StatusUnprocessableEntity, auth.LoginForm())
 		return
 	}
-	// ctx.SetCookie(repository.ACCESS_COOKIE.Type, accessToken, int(ttl), "", "", true, true)
 	cookie.SetCookie(ctx, accessToken, repository.ACCESS_COOKIE, ttl)
 
 	ctx.Writer.Header().Set("HX-Redirect", "/private")
 	ctx.Status(http.StatusNoContent)
+	return
+}
+
+func (h *AuthHandler) signinWithApplePOST(ctx *gin.Context) {
+	// var authResponse service.AppleAuthResponse
+	// err := ctx.ShouldBind(&authResponse)
+	// // Bind Apple response to struct
+	// if err != nil {
+	// 	ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+	// 	return
+	// }
+
+	// // Step 1: Verify the ID Token (JWT)
+	// claims, err := h.authService.VerifyAppleIDToken(authResponse.IDToken)
+	// if err != nil {
+	// 	ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid ID token"})
+	// 	return
+	// }
+
+	// // Step 2: Exchange Code for Apple Tokens (Access/Refresh)
+	// appleTokens, err := h.authService.ExchangeAppleCodeForTokens(authResponse.Code)
+	// if err != nil {
+	// 	ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to exchange authorization code"})
+	// 	return
+	// }
+
+	// // Step 3: Handle user authentication (create/find user in DB)
+	// userID := claims["sub"].(string)
+	// email := claims["email"].(string)
+
+	// // Find user in DB, or create a new one if needed
+	// user := h.userService.CreateUserWithApple(userID, email, appleTokens.RefreshToken)
+
+	// // Step 4: Issue Your Own Tokens (Access & Refresh)
+	// accessToken, refreshToken := GenerateAppTokens(user.ID)
+
+	// // Step 5: Set tokens in HTTP-only cookies
+	// c.SetCookie("access_token", accessToken, 900, "/", "", true, true)       // 15 mins
+	// c.SetCookie("refresh_token", refreshToken, 1209600, "/", "", true, true) // 14 days
+
+}
+
+func (h *AuthHandler) signinWithGooglePOST(ctx *gin.Context) {
+	var signInWithGoogle service.SignInWithGoogle
+	err := ctx.ShouldBind(&signInWithGoogle)
+	if err != nil {
+		render.Render(ctx, http.StatusUnprocessableEntity, auth.Login())
+		return
+	}
+
+	// CSRF Check
+	csrfCookie, err := ctx.Request.Cookie("g_csrf_token")
+	if err != nil {
+		render.Render(ctx, http.StatusUnprocessableEntity, auth.Login())
+		return
+	}
+
+	if signInWithGoogle.CSRFToken == "" || signInWithGoogle.CSRFToken != csrfCookie.Value {
+		render.Render(ctx, http.StatusUnprocessableEntity, auth.Login())
+		return
+	}
+
+	// 3. Validate the ID token
+	payload, err := h.authService.ValidateGoogleIdToken(ctx.Request.Context(), signInWithGoogle.IdToken)
+	if err != nil {
+		render.Render(ctx, http.StatusUnprocessableEntity, auth.Login())
+		return
+	}
+
+	// Create new user or login
+	userInfo, err := h.authService.GoogleLogin(ctx.Request.Context(), payload)
+	if err != nil {
+		render.Render(ctx, http.StatusUnprocessableEntity, auth.Login())
+		return
+	}
+
+	// create Refresh Token
+	refreshToken, ttl, err := h.sessionService.CreateRefreshToken(ctx.Request.Context(), userInfo)
+	if err != nil {
+		render.Render(ctx, http.StatusUnprocessableEntity, auth.Login())
+		return
+	}
+	cookie.SetCookie(ctx, refreshToken, repository.REFRESH_COOKIE, ttl)
+
+	// create Access Token
+	accessToken, ttl, err := h.sessionService.CreateAccessToken(ctx.Request.Context(), userInfo)
+	if err != nil {
+		render.Render(ctx, http.StatusUnprocessableEntity, auth.Login())
+		return
+	}
+	cookie.SetCookie(ctx, accessToken, repository.ACCESS_COOKIE, ttl)
+
+	ctx.Redirect(http.StatusFound, "/private")
 	return
 }
 
@@ -135,25 +216,7 @@ func (h *AuthHandler) signupGET(ctx *gin.Context) {
 	render.Render(ctx, 200, auth.Signup())
 }
 
-func (h *AuthHandler) signupPOST(ctx *gin.Context) {
-	method := ctx.Param("method")
-	switch method {
-	case "email":
-		h.signupWithEmail(ctx)
-		return
-	case "apple":
-		ctx.Status(200)
-		return
-	case "google":
-		ctx.Status(200)
-		return
-	default:
-		ctx.Status(404)
-		return
-	}
-}
-
-func (h *AuthHandler) signupWithEmail(ctx *gin.Context) {
+func (h *AuthHandler) signupWithEmailPOST(ctx *gin.Context) {
 	var signUpUserRequest service.SignUpWithEmailRequest
 	err := ctx.ShouldBind(&signUpUserRequest)
 	if err != nil {
@@ -168,14 +231,14 @@ func (h *AuthHandler) signupWithEmail(ctx *gin.Context) {
 		return
 	}
 
-	userId, err := h.userService.CreateUserWithEmail(ctx.Request.Context(), signUpUserRequest)
+	userInfo, err := h.authService.EmailSignUp(ctx.Request.Context(), signUpUserRequest)
 	if err != nil {
 		render.Render(ctx, http.StatusUnprocessableEntity, auth.SignupForm())
 		return
 	}
 
 	// create Refresh Token
-	refreshToken, ttl, err := h.sessionService.CreateRefreshToken(ctx.Request.Context(), userId)
+	refreshToken, ttl, err := h.sessionService.CreateRefreshToken(ctx.Request.Context(), userInfo)
 	if err != nil {
 		render.Render(ctx, http.StatusUnprocessableEntity, auth.SignupForm())
 		return
@@ -183,9 +246,9 @@ func (h *AuthHandler) signupWithEmail(ctx *gin.Context) {
 	cookie.SetCookie(ctx, refreshToken, repository.REFRESH_COOKIE, ttl)
 
 	// create Access Token
-	accessToken, ttl, err := h.sessionService.CreateAccessToken(ctx.Request.Context(), userId)
+	accessToken, ttl, err := h.sessionService.CreateAccessToken(ctx.Request.Context(), userInfo)
 	if err != nil {
-		render.Render(ctx, http.StatusUnprocessableEntity, auth.LoginForm())
+		render.Render(ctx, http.StatusUnprocessableEntity, auth.SignupForm())
 		return
 	}
 	cookie.SetCookie(ctx, accessToken, repository.ACCESS_COOKIE, ttl)
@@ -197,6 +260,10 @@ func (h *AuthHandler) signupWithEmail(ctx *gin.Context) {
 func (h *AuthHandler) logoutPOST(ctx *gin.Context) {
 	// We have no access cookie, so we check refresh cookie and generate new access token/cookie
 	// check refresh token
+	cookie.DeleteCookie(ctx, repository.ACCESS_COOKIE)
+	cookie.DeleteCookie(ctx, repository.REFRESH_COOKIE)
+	ctx.Writer.Header().Set("HX-Redirect", "/")
+
 	refreshCookieString, err := ctx.Cookie(repository.REFRESH_COOKIE.Type)
 	if err != nil || refreshCookieString == "" {
 		ctx.String(http.StatusUnauthorized, "Refresh Cookie not Set")
@@ -216,16 +283,25 @@ func (h *AuthHandler) logoutPOST(ctx *gin.Context) {
 	if err != nil {
 		ctx.Status(http.StatusInternalServerError)
 	}
-	cookie.DeleteCookie(ctx, repository.ACCESS_COOKIE)
-	cookie.DeleteCookie(ctx, repository.REFRESH_COOKIE)
-	ctx.Writer.Header().Set("HX-Redirect", "/")
 }
 
 func (h *AuthHandler) requestPasswordResetGET(ctx *gin.Context) {
+	weekLoggedIn := ctxHelpers.IsWeekLoggedInCtx(ctx.Request.Context())
+	if weekLoggedIn {
+		ctx.Writer.Header().Set("HX-Redirect", "/")
+		ctx.Status(http.StatusNoContent)
+		return
+	}
 	render.Render(ctx, 200, auth.RequestPasswordReset())
 }
 
 func (h *AuthHandler) requestPasswordResetPOST(ctx *gin.Context) {
+	weekLoggedIn := ctxHelpers.IsWeekLoggedInCtx(ctx.Request.Context())
+	if weekLoggedIn {
+		ctx.Writer.Header().Set("HX-Redirect", "/")
+		ctx.Status(http.StatusNoContent)
+		return
+	}
 	var requestPasswordResetRequest service.RequestPasswordResetRequest
 	err := ctx.ShouldBind(&requestPasswordResetRequest)
 	if err != nil {
@@ -253,6 +329,12 @@ func (h *AuthHandler) requestPasswordResetPOST(ctx *gin.Context) {
 }
 
 func (h *AuthHandler) resetPasswordGET(ctx *gin.Context) {
+	weekLoggedIn := ctxHelpers.IsWeekLoggedInCtx(ctx.Request.Context())
+	if weekLoggedIn {
+		ctx.Writer.Header().Set("HX-Redirect", "/")
+		ctx.Status(http.StatusNoContent)
+		return
+	}
 	token := ctx.Query("token")
 	if token == "" {
 		ctx.Redirect(http.StatusFound, "/404")
@@ -262,6 +344,12 @@ func (h *AuthHandler) resetPasswordGET(ctx *gin.Context) {
 }
 
 func (h *AuthHandler) resetPasswordPOST(ctx *gin.Context) {
+	weekLoggedIn := ctxHelpers.IsWeekLoggedInCtx(ctx.Request.Context())
+	if weekLoggedIn {
+		ctx.Writer.Header().Set("HX-Redirect", "/")
+		ctx.Status(http.StatusNoContent)
+		return
+	}
 	var resetPasswordRequest service.ResetPasswordRequest
 	err := ctx.ShouldBind(&resetPasswordRequest)
 	if err != nil {

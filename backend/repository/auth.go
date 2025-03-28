@@ -7,7 +7,8 @@ import (
 )
 
 type AuthStorage interface {
-	CreateAuthProvider(ctx context.Context, authProvider domain.AuthProvider, userId string) error
-	GetAuthProvider(ctx context.Context, userId string, method CreateUserMethod) (domain.AuthProvider, error)
+	CreateAuthProvider(ctx context.Context, authProvider domain.AuthProvider) error
+	GetAuthProviderByUserId(ctx context.Context, userId string, method CreateUserMethod) (domain.AuthProvider, error)
+	GetAuthProviderByProviderId(ctx context.Context, providerId string, method CreateUserMethod) (domain.AuthProvider, error)
 	UpdateUserPassword(ctx context.Context, userId string, password string) error
 }

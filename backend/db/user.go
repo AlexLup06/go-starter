@@ -14,7 +14,7 @@ func NewUserDb() repository.UserStorage {
 	return &userDb{}
 }
 
-func (u *userDb) CreateUser(ctx context.Context, user domain.User, authProvider domain.AuthProvider) (domain.User, error) {
+func (u *userDb) CreateUser(ctx context.Context, user domain.User) (domain.User, error) {
 	db, err := getContextDb(ctx)
 	if err != nil {
 		return domain.User{}, err
@@ -31,7 +31,7 @@ func (u *userDb) CreateUser(ctx context.Context, user domain.User, authProvider 
 
 	if err != nil {
 		if customErrors.IsUniqueConstraintViolationError(err) {
-			return domain.User{}, customErrors.ErrEmailAndProviderExist
+			return domain.User{}, customErrors.ErrUserWithAuthProviderExist
 		}
 		return domain.User{}, err
 	}
@@ -54,6 +54,19 @@ func (u *userDb) GetUserByEmail(ctx context.Context, email string) (domain.User,
 	return existingUser, nil
 }
 
-func (c *userDb) DeleteUser(ctx context.Context, id string) error {
+func (u *userDb) DeleteUser(ctx context.Context, id string) error {
+	return nil
+}
+
+func (u *userDb) UpdateUserEmail(ctx context.Context, userId, email string) error {
+	db, err := getContextDb(ctx)
+	if err != nil {
+		return err
+	}
+	err = db.Model(&domain.User{}).Where("id = ?", userId).Update("email", email).Error
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

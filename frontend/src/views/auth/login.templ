@@ -17,7 +17,7 @@ templ login() {
 		<div class="text-3xl mb-6">Log In</div>
 		<div class="flex gap-2">
 			<button class="w-1/2 bg-grey-200 py-2 px-4 rounded-xl ml-auto">Apple</button>
-			<button class="w-1/2 bg-grey-200 py-2 px-4 rounded-xl ml-auto">Google</button>
+			@googleSignIn()
 		</div>
 		<div class="relative flex justify-center my-3">
 			<p class="bg-grey-100 px-2">or</p>
@@ -53,7 +53,7 @@ templ login() {
 
 templ LoginForm() {
 	<form
-		hx-post="/auth/login/email"
+		hx-post="/auth/login"
 		hx-target="this"
 		hx-swap="outerHTML"
 		hx-on="htmx:beforeSwap: if(event.detail.xhr.status === 200) { window.location.href = '/'; }"
@@ -86,4 +86,23 @@ templ LoginForm() {
 		<br/>
 		<button type="submit" class="bg-grey-200 rounded-xl px-4 py-2 mt-3">Log In</button>
 	</form>
+}
+
+templ googleSignIn() {
+	<script src="https://accounts.google.com/gsi/client" async></script>
+	<div
+		id="g_id_onload"
+		data-client_id="672422627419-436pouhafc549n2vvghocabbsih1bf5g.apps.googleusercontent.com"
+		data-login_uri="http://localhost:3000/auth/google"
+		data-auto_prompt="false"
+	></div>
+	<div
+		class="g_id_signin"
+		data-type="standard"
+		data-size="large"
+		data-theme="outline"
+		data-text="sign_in_with"
+		data-shape="rectangular"
+		data-logo_alignment="left"
+	></div>
 }

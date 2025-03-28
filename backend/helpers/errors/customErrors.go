@@ -5,7 +5,7 @@ import "errors"
 var (
 	ErrRecordNotFound              = errors.New("record not found")
 	ErrDuplicatedKey               = errors.New("duplicated key not allowed")
-	ErrEmailAndProviderExist       = errors.New("email with the provider already exists")
+	ErrUserWithAuthProviderExist   = errors.New("User with the auth provider already exists")
 	ErrEmailExists                 = errors.New("email exists")
 	ErrAuthProviderExists          = errors.New("Auth provider already exists for the email")
 	ErrAuthProviderDoesNotExist    = errors.New("The auth Provider does not exist")
